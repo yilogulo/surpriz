@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fff5f8">
+<title>Eda'nın Sürprizi ❤️</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center;
+    padding: 24px; color: #392b33; overflow-x: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top left, #ffe0ec, transparent 42%),
+                linear-gradient(145deg, #fff8fb, #f8eaf1);
+  }
+  .card {
+    width: min(100%, 470px); padding: 32px 24px; text-align: center;
+    background: rgba(255,255,255,.9); border: 1px solid #f4d5e2;
+    border-radius: 28px; box-shadow: 0 20px 60px rgba(139,65,96,.12);
+    position: relative; z-index: 2;
+  }
+  .screen { display: none; animation: pop .35s ease both; }
+  .screen.active { display: block; }
+
+  .heart { font-size: 38px; margin-bottom: 8px; }
+  h1 { margin: 0; color: #c34e7d; font-size: clamp(25px, 6.8vw, 34px); line-height: 1.25; }
+  .sub { margin: 12px auto 26px; color: #806b75; line-height: 1.55; min-height: 24px; }
+
+  /* İlk ekran butonları */
+  .ask-actions {
+    display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+    margin-top: 8px; position: relative;
+  }
+  button.btn-yes, button.btn-no {
+    min-width: 145px; padding: 15px 22px; border-radius: 18px;
+    font-size: 18px; font-weight: 700; display: inline-flex;
+    align-items: center; justify-content: center; gap: 8px;
+    transition: transform .18s ease, box-shadow .18s ease, opacity .2s ease;
+  }
+  button.btn-yes {
+    border: 1px solid #5bc285;
+    background: linear-gradient(160deg, #34c77b, #1fa863);
+    color: #fff; cursor: pointer;
+    box-shadow: 0 10px 24px rgba(31, 168, 99, .25);
+  }
+  button.btn-yes:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(31, 168, 99, .34); }
+  button.btn-yes:focus-visible { outline: 3px solid #1fa863; outline-offset: 3px; }
+
+  button.btn-no {
+    border: 1px solid #f0a8a8;
+    background: linear-gradient(160deg, #ff5e5e, #e03b3b);
+    color: #fff; cursor: pointer;
+    user-select: none;
+    box-shadow: 0 8px 20px rgba(224, 59, 59, .18);
+  }
+  button.btn-no:hover { transform: translateY(-2px); }
+
+  /* 2. Hayır tıklamasında tüm ekranı kaplayan dev EVET */
+  .giant-yes-overlay {
+    position: fixed; inset: 0; z-index: 40;
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+    background: radial-gradient(circle at center, #38d984 0%, #1ea35f 100%);
+    animation: overlayIn .28s cubic-bezier(.22, 1, .36, 1) both;
+  }
+  .giant-yes-overlay.show { display: flex; }
+
+  .giant-yes-btn {
+    width: min(94vw, 680px);
+    min-height: min(68vh, 420px);
+    border: 5px solid rgba(255, 255, 255, .85);
+    border-radius: 36px;
+    background: linear-gradient(165deg, #ffffff, #eafff3);
+    color: #168a4e;
+    font-size: clamp(64px, 18vw, 150px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 0 28px 80px rgba(8, 61, 34, .38);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    animation: pulseGiant 1.35s ease-in-out infinite;
+  }
+  .giant-yes-btn:hover { transform: scale(1.03); }
+  .giant-yes-btn .sub-label {
+    font-size: clamp(16px, 4vw, 24px);
+    font-weight: 700;
+    color: #259e60;
+    letter-spacing: 0;
+  }
+
+  /* Kalp patlama katmanı */
+  .heart-burst-layer {
+    position: fixed; inset: 0; z-index: 50;
+    pointer-events: none; overflow: hidden;
+  }
+  .burst-heart {
+    position: fixed;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%) scale(0.2);
+    user-select: none;
+    will-change: transform, opacity;
+    animation: heartExplode var(--dur, 1.15s) cubic-bezier(.16, .88, .32, 1) forwards;
+  }
+
+  /* A / B / C ekranı */
+  .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  button.choice {
+    min-height: 132px; border: 1px solid #f0c6d7; border-radius: 20px;
+    background: linear-gradient(160deg, #fff, #fff1f6); color: #c34e7d;
+    cursor: pointer; transition: transform .16s, box-shadow .16s, opacity .16s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  }
+  button.choice:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 10px 24px #d98aaa33; }
+  button.choice:focus-visible { outline: 3px solid #d66c98; outline-offset: 3px; }
+  button.choice:disabled { cursor: default; opacity: .45; }
+  button.choice.selected { opacity: 1; border: 2px solid #cf5b89; background: #ffe5ef; }
+  .letter { font-size: 34px; font-weight: 800; line-height: 1; }
+  .gift { font-size: 27px; }
+  .hint { font-size: 12px; color: #9a7d8b; }
+
+  .result {
+    display: none; margin-top: 24px; padding: 22px 16px; border-radius: 20px;
+    background: #fff0f6; border: 1px solid #f2ccdc; animation: pop .35s ease both;
+  }
+  .result.show { display: block; }
+  .result .emoji { font-size: 48px; }
+  .result h2 { margin: 8px 0 6px; color: #c34e7d; font-size: 25px; }
+  .result p { margin: 0; color: #806b75; line-height: 1.5; }
+  .footer { margin-top: 24px; color: #ad91a0; font-size: 12px; }
+
+  @keyframes pop {
+    from { opacity: 0; transform: scale(.94) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes overlayIn {
+    from { opacity: 0; transform: scale(.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes pulseGiant {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.035); }
+  }
+  @keyframes heartExplode {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) translate(0px, 0px) scale(0.35) rotate(0deg);
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) translate(var(--tx, 0px), var(--ty, -160px)) scale(var(--sc, 1.35)) rotate(var(--rot, 25deg));
+    }
+  }
+  @media (max-width: 360px) {
+    .card { padding: 26px 16px; }
+    .choices { gap: 8px; }
+    button.choice { min-height: 116px; }
+    button.btn-yes, button.btn-no { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<main class="card">
+  <!-- İlk Ekran -->
+  <section class="screen active" id="askScreen" aria-label="Gün planı sorusu">
+    <div class="heart">💘</div>
+    <h1>Aşkımmm bugün beraberiz değil mi?</h1>
+    <p class="sub" id="askSub">Cevabın belli ama yine de sormak istedim...</p>
+
+    <div class="ask-actions">
+      <button class="btn-yes" id="yesBtn" type="button">🥳 Evet</button>
+      <button class="btn-no" id="noBtn" type="button">😡 Hayır</button>
+    </div>
+    <div class="footer" id="askFooter">Hayır demeyi deneme bakim ❤️</div>
+  </section>
+
+  <!-- İkinci Ekran: A / B / C Sürpriz Seçimi -->
+  <section class="screen" id="surpriseScreen" aria-label="Sürpriz seçimi">
+    <div class="heart">💗</div>
+    <h1>Eda'nın Sürprizleri</h1>
+    <p class="sub">Bugün seni üç güzel sürprizden biri bekliyor!<br><strong>Birini seç bakalım...</strong></p>
+
+    <div class="choices">
+      <button class="choice" data-choice="A" type="button"><span class="letter">A</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
+      <button class="choice" data-choice="B" type="button"><span class="letter">B</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
+      <button class="choice" data-choice="C" type="button"><span class="letter">C</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
+    </div>
+
+    <div class="result" id="result" aria-live="polite">
+      <div class="emoji" id="emoji">🎉</div>
+      <h2 id="title">Sürprizin ortaya çıktı!</h2>
+      <p id="description"></p>
+    </div>
+    <div class="footer">Seçimini kalbinle yap. ❤️</div>
+  </section>
+</main>
+
+<!-- 2. Hayır tıklamasında ekranı kaplayan dev EVET -->
+<div class="giant-yes-overlay" id="giantYesOverlay" aria-hidden="true">
+  <button class="giant-yes-btn" id="giantYesBtn" type="button">
+    <span>🥳 EVET!</span>
+    <span class="sub-label">Başka şansın yok aşkım 💕</span>
+  </button>
+</div>
+
+<!-- Kalp patlama katmanı -->
+<div class="heart-burst-layer" id="heartBurstLayer" aria-hidden="true"></div>
+
+<script>
+  const askScreen = document.getElementById("askScreen");
+  const surpriseScreen = document.getElementById("surpriseScreen");
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  const askSub = document.getElementById("askSub");
+  const askFooter = document.getElementById("askFooter");
+  const giantYesOverlay = document.getElementById("giantYesOverlay");
+  const giantYesBtn = document.getElementById("giantYesBtn");
+  const heartBurstLayer = document.getElementById("heartBurstLayer");
+
+  let noClickCount = 0;
+  let transitioning = false;
+
+  function explodeHearts(originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
+    const heartEmojis = ["❤️", "💖", "💕", "💗", "💓", "💘", "💝", "🥰"];
+    const total = 42;
+
+    for (let i = 0; i < total; i++) {
+      const el = document.createElement("span");
+      el.className = "burst-heart";
+      el.textContent = heartEmojis[i % heartEmojis.length];
+
+      const angle = (Math.PI * 2 * i) / total + (Math.random() - 0.5) * 0.35;
+      const distance = 120 + Math.random() * Math.max(window.innerWidth, window.innerHeight) * 0.52;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+      const sc = 0.95 + Math.random() * 1.25;
+      const rot = (Math.random() - 0.5) * 90;
+      const dur = 0.95 + Math.random() * 0.55;
+      const size = 24 + Math.random() * 24;
+
+      el.style.left = originX + "px";
+      el.style.top = originY + "px";
+      el.style.fontSize = size + "px";
+      el.style.setProperty("--tx", tx.toFixed(1) + "px");
+      el.style.setProperty("--ty", ty.toFixed(1) + "px");
+      el.style.setProperty("--sc", sc.toFixed(2));
+      el.style.setProperty("--rot", rot.toFixed(1) + "deg");
+      el.style.setProperty("--dur", dur.toFixed(2) + "s");
+
+      heartBurstLayer.appendChild(el);
+      setTimeout(() => el.remove(), (dur + 0.15) * 1000);
+    }
+  }
+
+  function triggerYesAndGoNext(event) {
+    if (transitioning) return;
+    transitioning = true;
+
+    const rect = event && event.currentTarget ? event.currentTarget.getBoundingClientRect() : null;
+    const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+
+    explodeHearts(cx, cy);
+    setTimeout(() => explodeHearts(window.innerWidth * 0.25, window.innerHeight * 0.35), 140);
+    setTimeout(() => explodeHearts(window.innerWidth * 0.75, window.innerHeight * 0.35), 220);
+
+    setTimeout(() => {
+      giantYesOverlay.classList.remove("show");
+      giantYesOverlay.setAttribute("aria-hidden", "true");
+      askScreen.classList.remove("active");
+      surpriseScreen.classList.add("active");
+    }, 520);
+  }
+
+  noBtn.addEventListener("click", () => {
+    noClickCount++;
+    if (noClickCount === 1) {
+      askSub.textContent = " Emin misin? Bir kere daha basarsan işler değişir...";
+      askFooter.textContent = "1. uyarı: Hayır seçeneği tehlikeli bölgede 👀";
+      noBtn.style.transform = "scale(0.92)";
+      yesBtn.style.transform = "scale(1.12)";
+    } else if (noClickCount >= 2) {
+      giantYesOverlay.classList.add("show");
+      giantYesOverlay.setAttribute("aria-hidden", "false");
+    }
+  });
+
+  yesBtn.addEventListener("click", triggerYesAndGoNext);
+  giantYesBtn.addEventListener("click", triggerYesAndGoNext);
+
+  // Aktiviteler her açılışta A/B/C harflerine yeniden ve rastgele atanır.
+  const activities = [
+    { name: "At Binme", emoji: "🐎", message: "Hazır ol! Birlikte at binmeye gidiyoruz." },
+    { name: "Bowling", emoji: "🎳", message: "Strike zamanı! Bowling oynuyoruz." },
+    { name: "Atış", emoji: "🎯", message: "Hedefini belirle! Atış deneyimi seni bekliyor." }
+  ];
+
+  for (let i = activities.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [activities[i], activities[j]] = [activities[j], activities[i]];
+  }
+
+  let chosen = false;
+  document.querySelectorAll(".choice").forEach(button => {
+    button.addEventListener("click", () => {
+      if (chosen) return;
+      chosen = true;
+      const letter = button.dataset.choice;
+      const index = letter.charCodeAt(0) - 65;
+      const activity = activities[index];
+
+      document.querySelectorAll(".choice").forEach(b => {
+        b.disabled = true;
+        if (b === button) b.classList.add("selected");
+      });
+
+      document.getElementById("emoji").textContent = activity.emoji;
+      document.getElementById("title").textContent = activity.name + "!";
+      document.getElementById("description").textContent =
+        letter + " seçeneğini seçtin. " + activity.message;
+      document.getElementById("result").classList.add("show");
+    });
+  });
+</script>
+</body>
+</html>
