@@ -15,8 +15,8 @@
                 linear-gradient(145deg, #fff8fb, #f8eaf1);
   }
   .card {
-    width: min(100%, 470px); padding: 32px 24px; text-align: center;
-    background: rgba(255,255,255,.9); border: 1px solid #f4d5e2;
+    width: min(100%, 500px); padding: 32px 24px; text-align: center;
+    background: rgba(255,255,255,.92); border: 1px solid #f4d5e2;
     border-radius: 28px; box-shadow: 0 20px 60px rgba(139,65,96,.12);
     position: relative; z-index: 2;
   }
@@ -24,8 +24,8 @@
   .screen.active { display: block; }
 
   .heart { font-size: 38px; margin-bottom: 8px; }
-  h1 { margin: 0; color: #c34e7d; font-size: clamp(25px, 6.8vw, 34px); line-height: 1.25; }
-  .sub { margin: 12px auto 26px; color: #806b75; line-height: 1.55; min-height: 24px; }
+  h1 { margin: 0; color: #c34e7d; font-size: clamp(24px, 6.5vw, 33px); line-height: 1.25; }
+  .sub { margin: 12px auto 24px; color: #806b75; line-height: 1.55; min-height: 24px; }
 
   /* İlk ekran butonları */
   .ask-actions {
@@ -103,13 +103,14 @@
     animation: heartExplode var(--dur, 1.15s) cubic-bezier(.16, .88, .32, 1) forwards;
   }
 
-  /* A / B / C ekranı */
+  /* A / B / C şans kutuları */
   .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   button.choice {
     min-height: 132px; border: 1px solid #f0c6d7; border-radius: 20px;
     background: linear-gradient(160deg, #fff, #fff1f6); color: #c34e7d;
     cursor: pointer; transition: transform .16s, box-shadow .16s, opacity .16s;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 8px;
   }
   button.choice:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 10px 24px #d98aaa33; }
   button.choice:focus-visible { outline: 3px solid #d66c98; outline-offset: 3px; }
@@ -119,15 +120,90 @@
   .gift { font-size: 27px; }
   .hint { font-size: 12px; color: #9a7d8b; }
 
+  /* Ara aktivite rozeti */
+  .picked-activity-banner {
+    display: none; margin-top: 18px; padding: 14px 16px; border-radius: 18px;
+    background: #fff0f6; border: 1px solid #f2ccdc; animation: pop .3s ease both;
+  }
+  .picked-activity-banner.show { display: block; }
+  .picked-activity-banner .badge-line {
+    font-size: 21px; font-weight: 800; color: #c34e7d;
+  }
+  .picked-activity-banner p {
+    margin: 4px 0 0; color: #806b75; font-size: 14px; line-height: 1.45;
+  }
+
+  /* 2. Şans seçimi: Gezme rotası */
+  .place-luck-section {
+    display: none; margin-top: 22px; animation: pop .35s ease both;
+  }
+  .place-luck-section.show { display: block; }
+  .place-luck-head {
+    margin-bottom: 14px;
+  }
+  .place-luck-head h3 {
+    margin: 0 0 4px; color: #c34e7d; font-size: 20px;
+  }
+  .place-luck-head p {
+    margin: 0; color: #806b75; font-size: 14px; line-height: 1.45;
+  }
+
+  /* Final sonuç ekranı */
   .result {
-    display: none; margin-top: 24px; padding: 22px 16px; border-radius: 20px;
-    background: #fff0f6; border: 1px solid #f2ccdc; animation: pop .35s ease both;
+    display: none; margin-top: 22px; padding: 22px 18px; border-radius: 22px;
+    background: #fff0f6; border: 1px solid #f2ccdc; text-align: left;
+    animation: pop .35s ease both;
   }
   .result.show { display: block; }
-  .result .emoji { font-size: 48px; }
-  .result h2 { margin: 8px 0 6px; color: #c34e7d; font-size: 25px; }
-  .result p { margin: 0; color: #806b75; line-height: 1.5; }
-  .footer { margin-top: 24px; color: #ad91a0; font-size: 12px; }
+  .result-header {
+    text-align: center; margin-bottom: 14px;
+  }
+  .result .emoji { font-size: 46px; }
+  .result h2 { margin: 6px 0 4px; color: #c34e7d; font-size: 24px; text-align: center; }
+  .result .subtitle { margin: 0; color: #806b75; font-size: 14px; text-align: center; }
+
+  .summary-box {
+    background: rgba(255, 255, 255, .85);
+    border: 1px solid #f0cada;
+    border-radius: 16px;
+    padding: 14px 15px;
+    margin-top: 12px;
+  }
+  .summary-label {
+    font-size: 12px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: .5px; color: #b94676; margin-bottom: 6px;
+  }
+  .summary-activity {
+    font-size: 16px; font-weight: 700; color: #392b33; margin: 0 0 4px;
+  }
+  .summary-desc {
+    font-size: 13.5px; color: #7a6570; margin: 0; line-height: 1.45;
+  }
+  .place-list {
+    list-style: none; margin: 8px 0 0; padding: 0;
+  }
+  .place-list li {
+    position: relative; padding: 7px 0 7px 22px;
+    border-bottom: 1px dashed #edd0dc;
+    font-size: 14px; color: #392b33; line-height: 1.4;
+  }
+  .place-list li:last-child { border-bottom: none; padding-bottom: 2px; }
+  .place-list li::before {
+    content: "📍"; position: absolute; left: 0; top: 7px; font-size: 13px;
+  }
+  .route-tip {
+    margin: 10px 0 0; font-size: 13px; color: #8f5770; font-style: italic; line-height: 1.45;
+  }
+
+  .action-btn {
+    margin-top: 14px; padding: 11px 18px; border-radius: 14px;
+    border: 1px solid #e5b2c7; background: #fff; color: #c34e7d;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .action-btn:hover { background: #ffe8f1; transform: translateY(-1px); }
+
+  .footer { margin-top: 24px; color: #ad91a0; font-size: 12px; text-align: center; }
 
   @keyframes pop {
     from { opacity: 0; transform: scale(.94) translateY(8px); }
@@ -154,7 +230,7 @@
       transform: translate(-50%, -50%) translate(var(--tx, 0px), var(--ty, -160px)) scale(var(--sc, 1.35)) rotate(var(--rot, 25deg));
     }
   }
-  @media (max-width: 360px) {
+  @media (max-width: 380px) {
     .card { padding: 26px 16px; }
     .choices { gap: 8px; }
     button.choice { min-height: 116px; }
@@ -177,23 +253,64 @@
     <div class="footer" id="askFooter">Hayır demeyi deneme bakim ❤️</div>
   </section>
 
-  <!-- İkinci Ekran: A / B / C Sürpriz Seçimi -->
+  <!-- İkinci Ekran: 1. Şans (Aktivite) -> 2. Şans (Gezilecek Yer Rotası) -> Sonuç -->
   <section class="screen" id="surpriseScreen" aria-label="Sürpriz seçimi">
     <div class="heart">💗</div>
     <h1>Eda'nın Sürprizleri</h1>
-    <p class="sub">Bugün seni üç güzel sürprizden biri bekliyor!<br><strong>Birini seç bakalım...</strong></p>
+    <p class="sub">Bugün seni üç güzel sürprizden biri bekliyor!<br><strong>Önce aktivite şansını seç bakalım...</strong></p>
 
-    <div class="choices">
-      <button class="choice" data-choice="A" type="button"><span class="letter">A</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
-      <button class="choice" data-choice="B" type="button"><span class="letter">B</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
-      <button class="choice" data-choice="C" type="button"><span class="letter">C</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
+    <!-- 1. Şans Seçimi: Aktivite -->
+    <div class="choices" id="activityChoices" aria-label="Aktivite seçimi">
+      <button class="choice" data-choice="A" type="button"><span class="letter">A</span><span class="gift">🎁</span><span class="hint">Aktivite</span></button>
+      <button class="choice" data-choice="B" type="button"><span class="letter">B</span><span class="gift">🎁</span><span class="hint">Aktivite</span></button>
+      <button class="choice" data-choice="C" type="button"><span class="letter">C</span><span class="gift">🎁</span><span class="hint">Aktivite</span></button>
     </div>
 
+    <!-- Seçilen Aktivite Rozeti -->
+    <div class="picked-activity-banner" id="pickedActivityBanner">
+      <div class="badge-line" id="pickedActivityTitle"></div>
+      <p id="pickedActivityMessage"></p>
+    </div>
+
+    <!-- 2. Şans Seçimi: Gezilecek Yer Rotası (Tamamen Şansa Bağlı) -->
+    <div class="place-luck-section" id="placeLuckSection">
+      <div class="place-luck-head">
+        <h3>Şimdi Gezme Şansını Seç ✨</h3>
+        <p>Harfler gizli! Birini seç, birbirine yakın duraklardan oluşan sürpriz rotan açılsın:</p>
+      </div>
+      <div class="choices" id="placeChoices" aria-label="Gezilecek yer şans seçimi">
+        <button class="choice" data-choice="A" type="button"><span class="letter">A</span><span class="gift">🗺️</span><span class="hint">Sürpriz Yer</span></button>
+        <button class="choice" data-choice="B" type="button"><span class="letter">B</span><span class="gift">🗺️</span><span class="hint">Sürpriz Yer</span></button>
+        <button class="choice" data-choice="C" type="button"><span class="letter">C</span><span class="gift">🗺️</span><span class="hint">Sürpriz Yer</span></button>
+      </div>
+    </div>
+
+    <!-- Final Sonuç Ekranı -->
     <div class="result" id="result" aria-live="polite">
-      <div class="emoji" id="emoji">🎉</div>
-      <h2 id="title">Sürprizin ortaya çıktı!</h2>
-      <p id="description"></p>
+      <div class="result-header">
+        <div class="emoji" id="resultEmoji">🎉</div>
+        <h2>Günün Sürpriz Planı!</h2>
+        <p class="subtitle" id="resultSubtitle"></p>
+      </div>
+
+      <div class="summary-box">
+        <div class="summary-label">Seçilen Aktivite</div>
+        <p class="summary-activity" id="summaryActivity"></p>
+        <p class="summary-desc" id="summaryDesc"></p>
+      </div>
+
+      <div class="summary-box">
+        <div class="summary-label">Çıkan Gezilecek Yerler Rotası</div>
+        <p class="summary-activity" id="summaryRouteTitle"></p>
+        <ul class="place-list" id="placeList"></ul>
+        <p class="route-tip" id="routeTip"></p>
+      </div>
+
+      <div style="text-align: center;">
+        <button class="action-btn" id="resetBtn" type="button">Baştan Dene 🔄</button>
+      </div>
     </div>
+
     <div class="footer">Seçimini kalbinle yap. ❤️</div>
   </section>
 </main>
@@ -220,8 +337,74 @@
   const giantYesBtn = document.getElementById("giantYesBtn");
   const heartBurstLayer = document.getElementById("heartBurstLayer");
 
+  const pickedActivityBanner = document.getElementById("pickedActivityBanner");
+  const pickedActivityTitle = document.getElementById("pickedActivityTitle");
+  const pickedActivityMessage = document.getElementById("pickedActivityMessage");
+  const placeLuckSection = document.getElementById("placeLuckSection");
+  const resultEl = document.getElementById("result");
+  const resetBtn = document.getElementById("resetBtn");
+
   let noClickCount = 0;
   let transitioning = false;
+  let selectedActivity = null;
+  let selectedActivityLetter = "";
+  let placeChosen = false;
+
+  const baseActivities = [
+    { name: "At Binme", emoji: "🐎", message: "Hazır ol! Birlikte at binmeye gidiyoruz." },
+    { name: "Bowling", emoji: "🎳", message: "Strike zamanı! Bowling oynuyoruz." },
+    { name: "Atış", emoji: "🎯", message: "Hedefini belirle! Atış deneyimi seni bekliyor." }
+  ];
+
+  const baseRoutes = [
+    {
+      title: "Tarihi Yarımada Rotası",
+      places: [
+        "Topkapı Sarayı",
+        "Ayasofya",
+        "Yerebatan Sarnıcı",
+        "Vezirhan Çevresi",
+        "Eminönü"
+      ],
+      tip: "Tüm duraklar Sultanahmet–Eminönü hattında birbirine yürüme veya kısa tramvay mesafesinde."
+    },
+    {
+      title: "Avrupa Yakası Boğaz Rotası",
+      places: [
+        "Ortaköy Sahil",
+        "Bebek Sahil",
+        "Rumeli Hisarı"
+      ],
+      tip: "Boğaz kıyısı boyunca sahil otobüsü veya sahil yürüyüşüyle kolayca birbirine bağlanır."
+    },
+    {
+      title: "Galata, Eminönü & Hisar Hattı",
+      places: [
+        "Eminönü",
+        "Galata Kulesi",
+        "Bebek Sahil & Rumeli Hisarı",
+        "Anadolu Hisarı"
+      ],
+      tip: "Eminönü ile Galata köprü/yürüyüşle yakın; Boğaz hattında ise kısa vapur/motor geçişiyle karşı kıyıya bağlanır."
+    }
+  ];
+
+  let shuffledActivities = [];
+  let shuffledRoutes = [];
+
+  function shuffleArray(arr) {
+    const copy = arr.map(item => ({ ...item, places: item.places ? [...item.places] : undefined }));
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function randomizeAll() {
+    shuffledActivities = shuffleArray(baseActivities);
+    shuffledRoutes = shuffleArray(baseRoutes);
+  }
 
   function explodeHearts(originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
     const heartEmojis = ["❤️", "💖", "💕", "💗", "💓", "💘", "💝", "🥰"];
@@ -275,6 +458,29 @@
     }, 520);
   }
 
+  function resetSurpriseFlow() {
+    selectedActivity = null;
+    selectedActivityLetter = "";
+    placeChosen = false;
+    randomizeAll();
+
+    document.querySelectorAll("#activityChoices .choice").forEach(b => {
+      b.disabled = false;
+      b.classList.remove("selected");
+      b.querySelector(".hint").textContent = "Aktivite";
+    });
+
+    document.querySelectorAll("#placeChoices .choice").forEach(b => {
+      b.disabled = false;
+      b.classList.remove("selected");
+      b.querySelector(".hint").textContent = "Sürpriz Yer";
+    });
+
+    pickedActivityBanner.classList.remove("show");
+    placeLuckSection.classList.remove("show");
+    resultEl.classList.remove("show");
+  }
+
   noBtn.addEventListener("click", () => {
     noClickCount++;
     if (noClickCount === 1) {
@@ -290,40 +496,71 @@
 
   yesBtn.addEventListener("click", triggerYesAndGoNext);
   giantYesBtn.addEventListener("click", triggerYesAndGoNext);
+  resetBtn.addEventListener("click", resetSurpriseFlow);
 
-  // Aktiviteler her açılışta A/B/C harflerine yeniden ve rastgele atanır.
-  const activities = [
-    { name: "At Binme", emoji: "🐎", message: "Hazır ol! Birlikte at binmeye gidiyoruz." },
-    { name: "Bowling", emoji: "🎳", message: "Strike zamanı! Bowling oynuyoruz." },
-    { name: "Atış", emoji: "🎯", message: "Hedefini belirle! Atış deneyimi seni bekliyor." }
-  ];
-
-  for (let i = activities.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [activities[i], activities[j]] = [activities[j], activities[i]];
-  }
-
-  let chosen = false;
-  document.querySelectorAll(".choice").forEach(button => {
+  // 1. Şans: Aktivite Seçimi (A/B/C rastgele atanmış)
+  document.querySelectorAll("#activityChoices .choice").forEach(button => {
     button.addEventListener("click", () => {
-      if (chosen) return;
-      chosen = true;
+      if (selectedActivity) return;
       const letter = button.dataset.choice;
       const index = letter.charCodeAt(0) - 65;
-      const activity = activities[index];
+      selectedActivity = shuffledActivities[index];
+      selectedActivityLetter = letter;
 
-      document.querySelectorAll(".choice").forEach(b => {
+      document.querySelectorAll("#activityChoices .choice").forEach((b, idx) => {
         b.disabled = true;
+        b.querySelector(".hint").textContent = shuffledActivities[idx].name;
         if (b === button) b.classList.add("selected");
       });
 
-      document.getElementById("emoji").textContent = activity.emoji;
-      document.getElementById("title").textContent = activity.name + "!";
-      document.getElementById("description").textContent =
-        letter + " seçeneğini seçtin. " + activity.message;
-      document.getElementById("result").classList.add("show");
+      pickedActivityTitle.textContent = `${selectedActivity.emoji} ${selectedActivity.name}!`;
+      pickedActivityMessage.textContent = `${letter} şansından bu aktivite çıktı. ${selectedActivity.message}`;
+      pickedActivityBanner.classList.add("show");
+
+      placeLuckSection.classList.add("show");
+      placeLuckSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
   });
+
+  // 2. Şans: Gezilecek Yer Rotası Seçimi (A/B/C rastgele atanmış)
+  document.querySelectorAll("#placeChoices .choice").forEach(button => {
+    button.addEventListener("click", () => {
+      if (placeChosen || !selectedActivity) return;
+      placeChosen = true;
+
+      const letter = button.dataset.choice;
+      const index = letter.charCodeAt(0) - 65;
+      const chosenRoute = shuffledRoutes[index];
+
+      document.querySelectorAll("#placeChoices .choice").forEach((b, idx) => {
+        b.disabled = true;
+        b.querySelector(".hint").textContent = `Rota ${idx + 1}`;
+        if (b === button) b.classList.add("selected");
+      });
+
+      document.getElementById("resultEmoji").textContent = selectedActivity.emoji;
+      document.getElementById("resultSubtitle").textContent =
+        `Aktivite: ${selectedActivityLetter} (${selectedActivity.name}) • Yer Şansı: ${letter}`;
+      document.getElementById("summaryActivity").textContent =
+        `${selectedActivity.emoji} ${selectedActivity.name}`;
+      document.getElementById("summaryDesc").textContent = selectedActivity.message;
+
+      document.getElementById("summaryRouteTitle").textContent = `🗺️ ${chosenRoute.title}`;
+      const placeListEl = document.getElementById("placeList");
+      placeListEl.innerHTML = "";
+      chosenRoute.places.forEach(place => {
+        const li = document.createElement("li");
+        li.textContent = place;
+        placeListEl.appendChild(li);
+      });
+
+      document.getElementById("routeTip").textContent = chosenRoute.tip;
+      resultEl.classList.add("show");
+      resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  });
+
+  randomizeAll();
 </script>
 </body>
 </html>
