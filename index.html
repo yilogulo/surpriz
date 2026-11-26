@@ -8,68 +8,89 @@
 <style>
   * { box-sizing: border-box; }
   body {
-    margin: 0; min-height: 100vh; display: grid; place-items: center;
-    padding: 24px; color: #392b33; overflow-x: hidden;
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    color: #392b33;
+    overflow-x: hidden;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: radial-gradient(circle at top left, #ffe0ec, transparent 42%),
                 linear-gradient(145deg, #fff8fb, #f8eaf1);
   }
   .card {
-    width: min(100%, 500px); padding: 32px 24px; text-align: center;
-    background: rgba(255,255,255,.92); border: 1px solid #f4d5e2;
-    border-radius: 28px; box-shadow: 0 20px 60px rgba(139,65,96,.12);
-    position: relative; z-index: 2;
+    width: min(100%, 500px);
+    padding: 32px 24px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #f4d5e2;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(139, 65, 96, 0.12);
+    position: relative;
+    z-index: 2;
   }
-  .screen { display: none; animation: pop .35s ease both; }
-  .screen.active { display: block; }
+  .screen { display: none; }
+  .screen.active { display: block; animation: pop 0.35s ease both; }
 
   .heart { font-size: 38px; margin-bottom: 8px; }
   h1 { margin: 0; color: #c34e7d; font-size: clamp(24px, 6.5vw, 33px); line-height: 1.25; }
   .sub { margin: 12px auto 24px; color: #806b75; line-height: 1.55; min-height: 24px; }
 
-  /* İlk ekran butonları */
   .ask-actions {
-    display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
-    margin-top: 8px; position: relative;
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
   }
   button.btn-yes, button.btn-no {
-    min-width: 145px; padding: 15px 22px; border-radius: 18px;
-    font-size: 18px; font-weight: 700; display: inline-flex;
-    align-items: center; justify-content: center; gap: 8px;
-    transition: transform .18s ease, box-shadow .18s ease, opacity .2s ease;
+    min-width: 145px;
+    padding: 15px 22px;
+    border-radius: 18px;
+    font-size: 18px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.2s ease;
   }
   button.btn-yes {
     border: 1px solid #5bc285;
     background: linear-gradient(160deg, #34c77b, #1fa863);
-    color: #fff; cursor: pointer;
-    box-shadow: 0 10px 24px rgba(31, 168, 99, .25);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(31, 168, 99, 0.25);
   }
-  button.btn-yes:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(31, 168, 99, .34); }
-  button.btn-yes:focus-visible { outline: 3px solid #1fa863; outline-offset: 3px; }
+  button.btn-yes:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(31, 168, 99, 0.34); }
 
   button.btn-no {
     border: 1px solid #f0a8a8;
     background: linear-gradient(160deg, #ff5e5e, #e03b3b);
-    color: #fff; cursor: pointer;
+    color: #fff;
+    cursor: pointer;
     user-select: none;
-    box-shadow: 0 8px 20px rgba(224, 59, 59, .18);
+    box-shadow: 0 8px 20px rgba(224, 59, 59, 0.18);
   }
   button.btn-no:hover { transform: translateY(-2px); }
 
-  /* 2. Hayır tıklamasında tüm ekranı kaplayan dev EVET */
   .giant-yes-overlay {
-    position: fixed; inset: 0; z-index: 40;
-    display: none; align-items: center; justify-content: center;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: none;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
     background: radial-gradient(circle at center, #38d984 0%, #1ea35f 100%);
-    animation: overlayIn .28s cubic-bezier(.22, 1, .36, 1) both;
   }
-  .giant-yes-overlay.show { display: flex; }
+  .giant-yes-overlay.show { display: flex; animation: overlayIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
   .giant-yes-btn {
     width: min(94vw, 680px);
     min-height: min(68vh, 420px);
-    border: 5px solid rgba(255, 255, 255, .85);
+    border: 5px solid rgba(255, 255, 255, 0.85);
     border-radius: 36px;
     background: linear-gradient(165deg, #ffffff, #eafff3);
     color: #168a4e;
@@ -77,11 +98,14 @@
     font-weight: 900;
     letter-spacing: 2px;
     cursor: pointer;
-    box-shadow: 0 28px 80px rgba(8, 61, 34, .38);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: 0 28px 80px rgba(8, 61, 34, 0.38);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     animation: pulseGiant 1.35s ease-in-out infinite;
   }
-  .giant-yes-btn:hover { transform: scale(1.03); }
   .giant-yes-btn .sub-label {
     font-size: clamp(16px, 4vw, 24px);
     font-weight: 700;
@@ -89,138 +113,145 @@
     letter-spacing: 0;
   }
 
-  /* Kalp patlama katmanı */
   .heart-burst-layer {
-    position: fixed; inset: 0; z-index: 50;
-    pointer-events: none; overflow: hidden;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    overflow: hidden;
   }
   .burst-heart {
     position: fixed;
-    left: 50%; top: 50%;
     transform: translate(-50%, -50%) scale(0.2);
     user-select: none;
     will-change: transform, opacity;
-    animation: heartExplode var(--dur, 1.15s) cubic-bezier(.16, .88, .32, 1) forwards;
+    animation: heartExplode var(--dur, 1.15s) cubic-bezier(0.16, 0.88, 0.32, 1) forwards;
   }
 
-  /* A / B / C şans kutuları */
   .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   button.choice {
-    min-height: 132px; border: 1px solid #f0c6d7; border-radius: 20px;
-    background: linear-gradient(160deg, #fff, #fff1f6); color: #c34e7d;
-    cursor: pointer; transition: transform .16s, box-shadow .16s, opacity .16s;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    min-height: 132px;
+    border: 1px solid #f0c6d7;
+    border-radius: 20px;
+    background: linear-gradient(160deg, #fff, #fff1f6);
+    color: #c34e7d;
+    cursor: pointer;
+    transition: transform 0.16s, box-shadow 0.16s, opacity 0.16s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     padding: 12px 8px;
   }
-  button.choice:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 10px 24px #d98aaa33; }
-  button.choice:focus-visible { outline: 3px solid #d66c98; outline-offset: 3px; }
-  button.choice:disabled { cursor: default; opacity: .45; }
+  button.choice:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(217, 138, 170, 0.25); }
+  button.choice:disabled { cursor: default; opacity: 0.48; }
   button.choice.selected { opacity: 1; border: 2px solid #cf5b89; background: #ffe5ef; }
   .letter { font-size: 34px; font-weight: 800; line-height: 1; }
   .gift { font-size: 27px; }
-  .hint { font-size: 12px; color: #9a7d8b; }
+  .hint { font-size: 12px; color: #9a7d8b; line-height: 1.3; }
 
-  /* Ara aktivite rozeti */
   .picked-activity-banner {
-    display: none; margin-top: 18px; padding: 14px 16px; border-radius: 18px;
-    background: #fff0f6; border: 1px solid #f2ccdc; animation: pop .3s ease both;
+    display: none;
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: #fff0f6;
+    border: 1px solid #f2ccdc;
   }
-  .picked-activity-banner.show { display: block; }
-  .picked-activity-banner .badge-line {
-    font-size: 20px; font-weight: 800; color: #c34e7d;
-  }
-  .picked-activity-banner p {
-    margin: 5px 0 0; color: #806b75; font-size: 14px; line-height: 1.45;
-  }
+  .picked-activity-banner.show { display: block; animation: pop 0.3s ease both; }
+  .picked-activity-banner .badge-line { font-size: 20px; font-weight: 800; color: #c34e7d; }
+  .picked-activity-banner p { margin: 5px 0 0; color: #806b75; font-size: 14px; line-height: 1.45; }
 
-  /* 2. Şans seçimi: Gezme rotası */
-  .place-luck-section {
-    display: none; margin-top: 22px; animation: pop .35s ease both;
-  }
-  .place-luck-section.show { display: block; }
-  .place-luck-head {
-    margin-bottom: 14px;
-  }
-  .place-luck-head h3 {
-    margin: 0 0 4px; color: #c34e7d; font-size: 20px;
-  }
-  .place-luck-head p {
-    margin: 0; color: #806b75; font-size: 14px; line-height: 1.45;
-  }
+  .place-luck-section { display: none; margin-top: 22px; }
+  .place-luck-section.show { display: block; animation: pop 0.35s ease both; }
+  .place-luck-head { margin-bottom: 14px; }
+  .place-luck-head h3 { margin: 0 0 4px; color: #c34e7d; font-size: 20px; }
+  .place-luck-head p { margin: 0; color: #806b75; font-size: 14px; line-height: 1.45; }
 
-  /* Final sonuç ekranı */
   .result {
-    display: none; margin-top: 22px; padding: 22px 18px; border-radius: 22px;
-    background: #fff0f6; border: 1px solid #f2ccdc; text-align: left;
-    animation: pop .35s ease both;
+    display: none;
+    margin-top: 22px;
+    padding: 22px 18px;
+    border-radius: 22px;
+    background: #fff0f6;
+    border: 1px solid #f2ccdc;
+    text-align: left;
   }
-  .result.show { display: block; }
-  .result-header {
-    text-align: center; margin-bottom: 14px;
-  }
+  .result.show { display: block; animation: pop 0.35s ease both; }
+  .result-header { text-align: center; margin-bottom: 14px; }
   .result .emoji { font-size: 46px; }
   .result h2 { margin: 6px 0 4px; color: #c34e7d; font-size: 24px; text-align: center; }
   .result .subtitle { margin: 0; color: #806b75; font-size: 14px; text-align: center; }
 
   .summary-box {
-    background: rgba(255, 255, 255, .85);
+    background: rgba(255, 255, 255, 0.88);
     border: 1px solid #f0cada;
     border-radius: 16px;
     padding: 14px 15px;
     margin-top: 12px;
   }
   .summary-label {
-    font-size: 12px; font-weight: 800; text-transform: uppercase;
-    letter-spacing: .5px; color: #b94676; margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #b94676;
+    margin-bottom: 6px;
   }
-  .summary-activity {
-    font-size: 16px; font-weight: 700; color: #392b33; margin: 0 0 4px;
-  }
-  .summary-desc {
-    font-size: 13.5px; color: #7a6570; margin: 0; line-height: 1.45;
-  }
-  .activity-list {
-    list-style: none; margin: 8px 0 0; padding: 0;
-  }
+  .summary-activity { font-size: 16px; font-weight: 700; color: #392b33; margin: 0 0 4px; }
+  .summary-desc { font-size: 13.5px; color: #7a6570; margin: 0; line-height: 1.45; }
+
+  .activity-list, .place-list { list-style: none; margin: 8px 0 0; padding: 0; }
   .activity-list li {
     padding: 6px 0;
     border-bottom: 1px dashed #edd0dc;
-    font-size: 14px; color: #392b33; line-height: 1.4;
+    font-size: 14px;
+    color: #392b33;
+    line-height: 1.4;
   }
   .activity-list li:last-child { border-bottom: none; padding-bottom: 2px; }
 
-  .place-list {
-    list-style: none; margin: 8px 0 0; padding: 0;
-  }
   .place-list li {
-    position: relative; padding: 7px 0 7px 22px;
+    position: relative;
+    padding: 7px 0 7px 22px;
     border-bottom: 1px dashed #edd0dc;
-    font-size: 14px; color: #392b33; line-height: 1.4;
+    font-size: 14px;
+    color: #392b33;
+    line-height: 1.4;
   }
   .place-list li:last-child { border-bottom: none; padding-bottom: 2px; }
   .place-list li::before {
-    content: "📍"; position: absolute; left: 0; top: 7px; font-size: 13px;
+    content: "📍";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    font-size: 13px;
   }
-  .route-tip {
-    margin: 10px 0 0; font-size: 13px; color: #8f5770; font-style: italic; line-height: 1.45;
-  }
+  .route-tip { margin: 10px 0 0; font-size: 13px; color: #8f5770; font-style: italic; line-height: 1.45; }
 
   .action-btn {
-    margin-top: 14px; padding: 11px 18px; border-radius: 14px;
-    border: 1px solid #e5b2c7; background: #fff; color: #c34e7d;
-    font-size: 14px; font-weight: 700; cursor: pointer;
-    transition: transform .15s ease, background .15s ease;
+    margin-top: 14px;
+    padding: 11px 18px;
+    border-radius: 14px;
+    border: 1px solid #e5b2c7;
+    background: #fff;
+    color: #c34e7d;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
   }
   .action-btn:hover { background: #ffe8f1; transform: translateY(-1px); }
 
   .footer { margin-top: 24px; color: #ad91a0; font-size: 12px; text-align: center; }
 
   @keyframes pop {
-    from { opacity: 0; transform: scale(.94) translateY(8px); }
+    from { opacity: 0; transform: scale(0.94) translateY(8px); }
     to { opacity: 1; transform: scale(1) translateY(0); }
   }
   @keyframes overlayIn {
-    from { opacity: 0; transform: scale(.92); }
+    from { opacity: 0; transform: scale(0.92); }
     to { opacity: 1; transform: scale(1); }
   }
   @keyframes pulseGiant {
@@ -232,9 +263,7 @@
       opacity: 1;
       transform: translate(-50%, -50%) translate(0px, 0px) scale(0.35) rotate(0deg);
     }
-    75% {
-      opacity: 1;
-    }
+    75% { opacity: 1; }
     100% {
       opacity: 0;
       transform: translate(-50%, -50%) translate(var(--tx, 0px), var(--ty, -160px)) scale(var(--sc, 1.35)) rotate(var(--rot, 25deg));
@@ -250,7 +279,6 @@
 </head>
 <body>
 <main class="card">
-  <!-- İlk Ekran -->
   <section class="screen active" id="askScreen" aria-label="Gün planı sorusu">
     <div class="heart">💘</div>
     <h1>Aşkımmm bugün beraberiz değil mi?</h1>
@@ -263,26 +291,22 @@
     <div class="footer" id="askFooter">Hayır demeyi deneme bakim ❤️</div>
   </section>
 
-  <!-- İkinci Ekran: 1. Şans (At Binme Sabit + Lunapark / Atış / Bowling) -> 2. Şans (Gezilecek Yer Rotası) -> Sonuç -->
   <section class="screen" id="surpriseScreen" aria-label="Sürpriz seçimi">
     <div class="heart">💗</div>
     <h1>Eda'nın Sürprizleri</h1>
     <p class="sub">Her seçenekte <strong>At Binme</strong> garanti!<br>Üstüne şansına ek bir aktivite gelsin bakalım...</p>
 
-    <!-- 1. Şans Seçimi: Ekstra Aktivite (+ At Binme Her Zaman Sabit) -->
     <div class="choices" id="activityChoices" aria-label="Ekstra aktivite seçimi">
       <button class="choice" data-choice="A" type="button"><span class="letter">A</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
       <button class="choice" data-choice="B" type="button"><span class="letter">B</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
       <button class="choice" data-choice="C" type="button"><span class="letter">C</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
     </div>
 
-    <!-- Seçilen Aktivite Rozeti -->
     <div class="picked-activity-banner" id="pickedActivityBanner">
       <div class="badge-line" id="pickedActivityTitle"></div>
       <p id="pickedActivityMessage"></p>
     </div>
 
-    <!-- 2. Şans Seçimi: Gezilecek Yer Rotası (Tamamen Şansa Bağlı) -->
     <div class="place-luck-section" id="placeLuckSection">
       <div class="place-luck-head">
         <h3>Şimdi Gezme Şansını Seç ✨</h3>
@@ -295,7 +319,6 @@
       </div>
     </div>
 
-    <!-- Final Sonuç Ekranı -->
     <div class="result" id="result" aria-live="polite">
       <div class="result-header">
         <div class="emoji" id="resultEmoji">🐎🎡</div>
@@ -325,7 +348,6 @@
   </section>
 </main>
 
-<!-- 2. Hayır tıklamasında ekranı kaplayan dev EVET -->
 <div class="giant-yes-overlay" id="giantYesOverlay" aria-hidden="true">
   <button class="giant-yes-btn" id="giantYesBtn" type="button">
     <span>🥳 EVET!</span>
@@ -333,10 +355,10 @@
   </button>
 </div>
 
-<!-- Kalp patlama katmanı -->
 <div class="heart-burst-layer" id="heartBurstLayer" aria-hidden="true"></div>
 
 <script>
+(function () {
   const askScreen = document.getElementById("askScreen");
   const surpriseScreen = document.getElementById("surpriseScreen");
   const yesBtn = document.getElementById("yesBtn");
@@ -362,11 +384,9 @@
 
   const fixedActivity = {
     name: "At Binme",
-    emoji: "🐎",
-    note: "Her seçenekte garanti aktivitemiz."
+    emoji: "🐎"
   };
 
-  // At Binme her seçenekte sabit; ekstra olarak Lunapark, Atış ve Bowling rastgele dağılır
   const bonusActivities = [
     {
       name: "Lunapark",
@@ -422,7 +442,10 @@
   let shuffledRoutes = [];
 
   function shuffleArray(arr) {
-    const copy = arr.map(item => ({ ...item, places: item.places ? [...item.places] : undefined }));
+    const copy = arr.map(item => ({
+      ...item,
+      places: Array.isArray(item.places) ? [...item.places] : undefined
+    }));
     for (let i = copy.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [copy[i], copy[j]] = [copy[j], copy[i]];
@@ -435,7 +458,9 @@
     shuffledRoutes = shuffleArray(baseRoutes);
   }
 
-  function explodeHearts(originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
+  function explodeHearts(originX, originY) {
+    const cx = typeof originX === "number" ? originX : window.innerWidth / 2;
+    const cy = typeof originY === "number" ? originY : window.innerHeight / 2;
     const heartEmojis = ["❤️", "💖", "💕", "💗", "💓", "💘", "💝", "🥰"];
     const total = 42;
 
@@ -453,8 +478,8 @@
       const dur = 0.95 + Math.random() * 0.55;
       const size = 24 + Math.random() * 24;
 
-      el.style.left = originX + "px";
-      el.style.top = originY + "px";
+      el.style.left = cx + "px";
+      el.style.top = cy + "px";
       el.style.fontSize = size + "px";
       el.style.setProperty("--tx", tx.toFixed(1) + "px");
       el.style.setProperty("--ty", ty.toFixed(1) + "px");
@@ -463,7 +488,7 @@
       el.style.setProperty("--dur", dur.toFixed(2) + "s");
 
       heartBurstLayer.appendChild(el);
-      setTimeout(() => el.remove(), (dur + 0.15) * 1000);
+      setTimeout(() => el.remove(), Math.ceil((dur + 0.15) * 1000));
     }
   }
 
@@ -471,7 +496,8 @@
     if (transitioning) return;
     transitioning = true;
 
-    const rect = event && event.currentTarget ? event.currentTarget.getBoundingClientRect() : null;
+    const target = event && event.currentTarget ? event.currentTarget : null;
+    const rect = target && typeof target.getBoundingClientRect === "function" ? target.getBoundingClientRect() : null;
     const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
     const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
 
@@ -484,6 +510,7 @@
       giantYesOverlay.setAttribute("aria-hidden", "true");
       askScreen.classList.remove("active");
       surpriseScreen.classList.add("active");
+      transitioning = false;
     }, 520);
   }
 
@@ -496,13 +523,15 @@
     document.querySelectorAll("#activityChoices .choice").forEach(b => {
       b.disabled = false;
       b.classList.remove("selected");
-      b.querySelector(".hint").textContent = "Sürpriz";
+      const hint = b.querySelector(".hint");
+      if (hint) hint.textContent = "Sürpriz";
     });
 
     document.querySelectorAll("#placeChoices .choice").forEach(b => {
       b.disabled = false;
       b.classList.remove("selected");
-      b.querySelector(".hint").textContent = "Sürpriz Yer";
+      const hint = b.querySelector(".hint");
+      if (hint) hint.textContent = "Sürpriz Yer";
     });
 
     pickedActivityBanner.classList.remove("show");
@@ -513,7 +542,7 @@
   noBtn.addEventListener("click", () => {
     noClickCount++;
     if (noClickCount === 1) {
-      askSub.textContent = " Emin misin? Bir kere daha basarsan işler değişir...";
+      askSub.textContent = "Emin misin? Bir kere daha basarsan işler değişir...";
       askFooter.textContent = "1. uyarı: Hayır seçeneği tehlikeli bölgede 👀";
       noBtn.style.transform = "scale(0.92)";
       yesBtn.style.transform = "scale(1.12)";
@@ -527,7 +556,83 @@
   giantYesBtn.addEventListener("click", triggerYesAndGoNext);
   resetBtn.addEventListener("click", resetSurpriseFlow);
 
-  // 1. Şans: At Binme sabit + seçilen harften rastgele bonus aktivite (Lunapark / Atış / Bowling)
   document.querySelectorAll("#activityChoices .choice").forEach(button => {
     button.addEventListener("click", () => {
-     
+      if (selectedBonusActivity) return;
+      const letter = button.dataset.choice;
+      const index = letter.charCodeAt(0) - 65;
+      selectedBonusActivity = shuffledBonusActivities[index];
+      selectedActivityLetter = letter;
+
+      document.querySelectorAll("#activityChoices .choice").forEach((b, idx) => {
+        b.disabled = true;
+        const hint = b.querySelector(".hint");
+        if (hint && shuffledBonusActivities[idx]) {
+          hint.textContent = "🐎 + " + shuffledBonusActivities[idx].name;
+        }
+        if (b === button) b.classList.add("selected");
+      });
+
+      pickedActivityTitle.textContent = fixedAc
+
+                            fixedActivity.emoji + " " + fixedActivity.name + " + " + selectedBonusActivity.emoji + " " + selectedBonusActivity.name + "!";
+      pickedActivityMessage.textContent = letter + " şansından " + selectedBonusActivity.name + " çıktı. " + selectedBonusActivity.message;
+      pickedActivityBanner.classList.add("show");
+
+      placeLuckSection.classList.add("show");
+      placeLuckSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  });
+
+  document.querySelectorAll("#placeChoices .choice").forEach(button => {
+    button.addEventListener("click", () => {
+      if (placeChosen || !selectedBonusActivity) return;
+      placeChosen = true;
+
+      const letter = button.dataset.choice;
+      const index = letter.charCodeAt(0) - 65;
+      const chosenRoute = shuffledRoutes[index];
+
+      document.querySelectorAll("#placeChoices .choice").forEach((b, idx) => {
+        b.disabled = true;
+        const hint = b.querySelector(".hint");
+        if (hint) hint.textContent = "Rota " + (idx + 1);
+        if (b === button) b.classList.add("selected");
+      });
+
+      document.getElementById("resultEmoji").textContent = fixedActivity.emoji + selectedBonusActivity.emoji;
+      document.getElementById("resultSubtitle").textContent =
+        "Aktivite: " + selectedActivityLetter + " (" + fixedActivity.name + " + " + selectedBonusActivity.name + ") • Yer Şansı: " + letter;
+
+      const activityListEl = document.getElementById("activityList");
+      activityListEl.innerHTML = "";
+
+      const liFixed = document.createElement("li");
+      liFixed.innerHTML = "<strong>" + fixedActivity.emoji + " " + fixedActivity.name + "</strong> <em>(Sabit)</em>";
+      activityListEl.appendChild(liFixed);
+
+      const liBonus = document.createElement("li");
+      liBonus.innerHTML = "<strong>" + selectedBonusActivity.emoji + " " + selectedBonusActivity.name + "</strong> <em>(Şansına Gelen)</em>";
+      activityListEl.appendChild(liBonus);
+     document.getElementById("summaryDesc").textContent = selectedBonusActivity.message;
+      document.getElementById("summaryRouteTitle").textContent = "🗺️ " + chosenRoute.title;
+
+      const placeListEl = document.getElementById("placeList");
+      placeListEl.innerHTML = "";
+      chosenRoute.places.forEach(place => {
+        const li = document.createElement("li");
+        li.textContent = place;
+        placeListEl.appendChild(li);
+      });
+
+      document.getElementById("routeTip").textContent = chosenRoute.tip;
+      resultEl.classList.add("show");
+      resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  });
+
+  randomizeAll();
+})();
+</script>
+</body>
+</html>
