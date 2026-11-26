@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fff5f8">
+<title>Eda'nın Sürprizi ❤️</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    color: #392b33;
+    overflow-x: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top left, #ffe0ec, transparent 42%),
+                linear-gradient(145deg, #fff8fb, #f8eaf1);
+  }
+  .card {
+    width: min(100%, 500px);
+    padding: 32px 24px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #f4d5e2;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(139, 65, 96, 0.12);
+    position: relative;
+    z-index: 2;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; animation: pop 0.35s ease both; }
+
+  .heart { font-size: 38px; margin-bottom: 8px; }
+  h1 { margin: 0; color: #c34e7d; font-size: clamp(24px, 6.5vw, 33px); line-height: 1.25; }
+  .sub { margin: 12px auto 24px; color: #806b75; line-height: 1.55; min-height: 24px; }
+
+  .ask-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  button.btn-yes, button.btn-no {
+    min-width: 145px;
+    padding: 15px 22px;
+    border-radius: 18px;
+    font-size: 18px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.2s ease;
+  }
+  button.btn-yes {
+    border: 1px solid #5bc285;
+    background: linear-gradient(160deg, #34c77b, #1fa863);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(31, 168, 99, 0.25);
+  }
+  button.btn-yes:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(31, 168, 99, 0.34); }
+
+  button.btn-no {
+    border: 1px solid #f0a8a8;
+    background: linear-gradient(160deg, #ff5e5e, #e03b3b);
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 8px 20px rgba(224, 59, 59, 0.18);
+  }
+  button.btn-no:hover { transform: translateY(-2px); }
+
+  .giant-yes-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: radial-gradient(circle at center, #38d984 0%, #1ea35f 100%);
+  }
+  .giant-yes-overlay.show { display: flex; animation: overlayIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  .giant-yes-btn {
+    width: min(94vw, 680px);
+    min-height: min(68vh, 420px);
+    border: 5px solid rgba(255, 255, 255, 0.85);
+    border-radius: 36px;
+    background: linear-gradient(165deg, #ffffff, #eafff3);
+    color: #168a4e;
+    font-size: clamp(64px, 18vw, 150px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 0 28px 80px rgba(8, 61, 34, 0.38);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    animation: pulseGiant 1.35s ease-in-out infinite;
+  }
+  .giant-yes-btn .sub-label {
+    font-size: clamp(16px, 4vw, 24px);
+    font-weight: 700;
+    color: #259e60;
+    letter-spacing: 0;
+  }
+
+  .heart-burst-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .burst-heart {
+    position: fixed;
+    transform: translate(-50%, -50%) scale(0.2);
+    user-select: none;
+    will-change: transform, opacity;
+    animation: heartExplode var(--dur, 1.15s) cubic-bezier(0.16, 0.88, 0.32, 1) forwards;
+  }
+
+  .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  button.choice {
+    min-height: 132px;
+    border: 1px solid #f0c6d7;
+    border-radius: 20px;
+    background: linear-gradient(160deg, #fff, #fff1f6);
+    color: #c34e7d;
+    cursor: pointer;
+    transition: transform 0.16s, box-shadow 0.16s, opacity 0.16s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 8px;
+  }
+  button.choice:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(217, 138, 170, 0.25); }
+  button.choice:disabled { cursor: default; opacity: 0.48; }
+  button.choice.selected { opacity: 1; border: 2px solid #cf5b89; background: #ffe5ef; }
+  .letter { font-size: 34px; font-weight: 800; line-height: 1; }
+  .gift { font-size: 27px; }
+  .hint { font-size: 12px; color: #9a7d8b; line-height: 1.3; }
+
+  .picked-activity-banner {
+    display: none;
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: #fff0f6;
+    border: 1px solid #f2ccdc;
+  }
+  .picked-activity-banner.show { display: block; animation: pop 0.3s ease both; }
+  .picked-activity-banner .badge-line { font-size: 20px; font-weight: 800; color: #c34e7d; }
+  .picked-activity-banner p { margin: 5px 0 0; color: #806b75; font-size: 14px; line-height: 1.45; }
+
+  .place-luck-section { display: none; margin-top: 22px; }
+  .place-luck-section.show { display: block; animation: pop 0.35s ease both; }
+  .place-luck-head { margin-bottom: 14px; }
+  .place-luck-head h3 { margin: 0 0 4px; color: #c34e7d; font-size: 20px; }
+  .place-luck-head p { margin: 0; color: #806b75; font-size: 14px; line-height: 1.45; }
+
+  .result {
+    display: none;
+    margin-top: 22px;
+    padding: 22px 18px;
+    border-radius: 22px;
+    background: #fff0f6;
+    border: 1px solid #f2ccdc;
+    text-align: left;
+  }
+  .result.show { display: block; animation: pop 0.35s ease both; }
+  .result-header { text-align: center; margin-bottom: 14px; }
+  .result .emoji { font-size: 46px; }
+  .result h2 { margin: 6px 0 4px; color: #c34e7d; font-size: 24px; text-align: center; }
+  .result .subtitle { margin: 0; color: #806b75; font-size: 14px; text-align: center; }
+
+  .summary-box {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid #f0cada;
+    border-radius: 16px;
+    padding: 14px 15px;
+    margin-top: 12px;
+  }
+  .summary-label {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #b94676;
+    margin-bottom: 6px;
+  }
+  .summary-activity { font-size: 16px; font-weight: 700; color: #392b33; margin: 0 0 4px; }
+  .summary-desc { font-size: 13.5px; color: #7a6570; margin: 0; line-height: 1.45; }
+
+  .activity-list, .place-list { list-style: none; margin: 8px 0 0; padding: 0; }
+  .activity-list li {
+    padding: 6px 0;
+    border-bottom: 1px dashed #edd0dc;
+    font-size: 14px;
+    color: #392b33;
+    line-height: 1.4;
+  }
+  .activity-list li:last-child { border-bottom: none; padding-bottom: 2px; }
+
+  .place-list li {
+    position: relative;
+    padding: 7px 0 7px 22px;
+    border-bottom: 1px dashed #edd0dc;
+    font-size: 14px;
+    color: #392b33;
+    line-height: 1.4;
+  }
+  .place-list li:last-child { border-bottom: none; padding-bottom: 2px; }
+  .place-list li::before {
+    content: "📍";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    font-size: 13px;
+  }
+  .route-tip { margin: 10px 0 0; font-size: 13px; color: #8f5770; font-style: italic; line-height: 1.45; }
+
+  .action-btn {
+    margin-top: 14px;
+    padding: 11px 18px;
+    border-radius: 14px;
+    border: 1px solid #e5b2c7;
+    background: #fff;
+    color: #c34e7d;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .action-btn:hover { background: #ffe8f1; transform: translateY(-1px); }
+
+  .footer { margin-top: 24px; color: #ad91a0; font-size: 12px; text-align: center; }
+
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.94) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes overlayIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes pulseGiant {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.035); }
+  }
+  @keyframes heartExplode {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) translate(0px, 0px) scale(0.35) rotate(0deg);
+    }
+    75% { opacity: 1; }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) translate(var(--tx, 0px), var(--ty, -160px)) scale(var(--sc, 1.35)) rotate(var(--rot, 25deg));
+    }
+  }
+  @media (max-width: 380px) {
+    .card { padding: 26px 16px; }
+    .choices { gap: 8px; }
+    button.choice { min-height: 116px; }
+    button.btn-yes, button.btn-no { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<main class="card">
+  <section class="screen active" id="askScreen" aria-label="Gün planı sorusu">
+    <div class="heart">💘</div>
+    <h1>Aşkımmm bugün beraberiz değil mi?</h1>
+    <p class="sub" id="askSub">Cevabın belli ama yine de sormak istedim...</p>
+
+    <div class="ask-actions">
+      <button class="btn-yes" id="yesBtn" type="button">🥳 Evet</button>
+      <button class="btn-no" id="noBtn" type="button">😡 Hayır</button>
+    </div>
+    <div class="footer" id="askFooter">Hayır demeyi deneme bakim ❤️</div>
+  </section>
+
+  <section class="screen" id="surpriseScreen" aria-label="Sürpriz seçimi">
+    <div class="heart">💗</div>
+    <h1>Eda'nın Sürprizleri</h1>
+    <p class="sub">Her seçenekte <strong>At Binme</strong> garanti!<br>Üstüne şansına ek bir aktivite gelsin bakalım...</p>
+
+    <div class="choices" id="activityChoices" aria-label="Ekstra aktivite seçimi">
+      <button class="choice" data-choice="A" type="button"><span class="letter">A</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
+      <button class="choice" data-choice="B" type="button"><span class="letter">B</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
+      <button class="choice" data-choice="C" type="button"><span class="letter">C</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
+    </div>
+
+    <div class="picked-activity-banner" id="pickedActivityBanner">
+      <div class="badge-line" id="pickedActivityTitle"></div>
+      <p id="pickedActivityMessage"></p>
+    </div>
+
+    <div class="place-luck-section" id="placeLuckSection">
+      <div class="place-luck-head">
+        <h3>Şimdi Gezme Şansını Seç ✨</h3>
+        <p>Harfler gizli! Birini seç, birbirine yakın duraklardan oluşan sürpriz rotan açılsın:</p>
+      </div>
+      <div class="choices" id="placeChoices" aria-label="Gezilecek yer şans seçimi">
+        <button class="choice" data-choice="A" type="button"><span class="letter">A</span><span class="gift">🗺️</span><span class="hint">Sürpriz Yer</span></button>
+        <button class="choice" data-choice="B" type="button"><span class="letter">B</span><span class="gift">🗺️</span><span class="hint">Sürpriz Yer</span></button>
+        <button class="choice" data-choice="C" type="button"><span class="letter">C</span><span class="gift">🗺️</span><span class="hint">Sürpriz Yer</span></button>
+      </div>
+    </div>
+
+    <div class="result" id="result" aria-live="polite">
+      <div class="result-header">
+        <div class="emoji" id="resultEmoji">🐎🎡</div>
+        <h2>Günün Sürpriz Planı!</h2>
+        <p class="subtitle" id="resultSubtitle"></p>
+      </div>
+
+      <div class="summary-box">
+        <div class="summary-label">Günün Aktiviteleri (At Binme Sabit)</div>
+        <ul class="activity-list" id="activityList"></ul>
+        <p class="summary-desc" id="summaryDesc" style="margin-top: 8px;"></p>
+      </div>
+
+      <div class="summary-box">
+        <div class="summary-label">Çıkan Gezilecek Yerler Rotası</div>
+        <p class="summary-activity" id="summaryRouteTitle"></p>
+        <ul class="place-list" id="placeList"></ul>
+        <p class="route-tip" id="routeTip"></p>
+      </div>
+
+      <div style="text-align: center;">
+        <button class="action-btn" id="resetBtn" type="button">Baştan Dene 🔄</button>
+      </div>
+    </div>
+
+    <div class="footer">Seçimini kalbinle yap. ❤️</div>
+  </section>
+</main>
+
+<div class="giant-yes-overlay" id="giantYesOverlay" aria-hidden="true">
+  <button class="giant-yes-btn" id="giantYesBtn" type="button">
+    <span>🥳 EVET!</span>
+    <span class="sub-label">Başka şansın yok aşkım 💕</span>
+  </button>
+</div>
+
+<div class="heart-burst-layer" id="heartBurstLayer" aria-hidden="true"></div>
+
+<script>
+(function () {
+  const askScreen = document.getElementById("askScreen");
+  const surpriseScreen = document.getElementById("surpriseScreen");
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  const askSub = document.getElementById("askSub");
+  const askFooter = document.getElementById("askFooter");
+  const giantYesOverlay = document.getElementById("giantYesOverlay");
+  const giantYesBtn = document.getElementById("giantYesBtn");
+  const heartBurstLayer = document.getElementById("heartBurstLayer");
+
+  const pickedActivityBanner = document.getElementById("pickedActivityBanner");
+  const pickedActivityTitle = document.getElementById("pickedActivityTitle");
+  const pickedActivityMessage = document.getElementById("pickedActivityMessage");
+  const placeLuckSection = document.getElementById("placeLuckSection");
+  const resultEl = document.getElementById("result");
+  const resetBtn = document.getElementById("resetBtn");
+
+  let noClickCount = 0;
+  let transitioning = false;
+  let selectedBonusActivity = null;
+  let selectedActivityLetter = "";
+  let placeChosen = false;
+
+  const fixedActivity = {
+    name: "At Binme",
+    emoji: "🐎"
+  };
+
+  const bonusActivities = [
+    {
+      name: "Lunapark",
+      emoji: "🎡",
+      message: "At binmenin yanına lunapark keyfi eklendi!"
+    },
+    {
+      name: "Atış",
+      emoji: "🎯",
+      message: "At binmenin yanına hedef atışı eklendi!"
+    },
+    {
+      name: "Bowling",
+      emoji: "🎳",
+      message: "At binmenin yanına bowling kapışması eklendi!"
+    }
+  ];
+
+  const baseRoutes = [
+    {
+      title: "Tarihi Yarımada Rotası",
+      places: [
+        "Topkapı Sarayı",
+        "Ayasofya",
+        "Yerebatan Sarnıcı",
+        "Vezirhan Çevresi",
+        "Eminönü"
+      ],
+      tip: "Tüm duraklar Sultanahmet–Eminönü hattında birbirine yürüme veya kısa tramvay mesafesinde."
+    },
+    {
+      title: "Avrupa Yakası Boğaz Rotası",
+      places: [
+        "Ortaköy Sahil",
+        "Bebek Sahil",
+        "Rumeli Hisarı"
+      ],
+      tip: "Boğaz kıyısı boyunca sahil otobüsü veya sahil yürüyüşüyle kolayca birbirine bağlanır."
+    },
+    {
+      title: "Galata, Eminönü & Hisar Hattı",
+      places: [
+        "Eminönü",
+        "Galata Kulesi",
+        "Bebek Sahil & Rumeli Hisarı",
+        "Anadolu Hisarı"
+      ],
+      tip: "Eminönü ile Galata köprü/yürüyüşle yakın; Boğaz hattında ise kısa vapur/motor geçişiyle karşı kıyıya bağlanır."
+    }
+  ];
+
+  let shuffledBonusActivities = [];
+  let shuffledRoutes = [];
+
+  function shuffleArray(arr) {
+    const copy = arr.map(item => ({
+      ...item,
+      places: Array.isArray(item.places) ? [...item.places] : undefined
+    }));
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function randomizeAll() {
+    shuffledBonusActivities = shuffleArray(bonusActivities);
+    shuffledRoutes = shuffleArray(baseRoutes);
+  }
+
+  function explodeHearts(originX, originY) {
+    const cx = typeof originX === "number" ? originX : window.innerWidth / 2;
+    const cy = typeof originY === "number" ? originY : window.innerHeight / 2;
+    const heartEmojis = ["❤️", "💖", "💕", "💗", "💓", "💘", "💝", "🥰"];
+    const total = 42;
+
+    for (let i = 0; i < total; i++) {
+      const el = document.createElement("span");
+      el.className = "burst-heart";
+      el.textContent = heartEmojis[i % heartEmojis.length];
+
+      const angle = (Math.PI * 2 * i) / total + (Math.random() - 0.5) * 0.35;
+      const distance = 120 + Math.random() * Math.max(window.innerWidth, window.innerHeight) * 0.52;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+      const sc = 0.95 + Math.random() * 1.25;
+      const rot = (Math.random() - 0.5) * 90;
+      const dur = 0.95 + Math.random() * 0.55;
+      const size = 24 + Math.random() * 24;
+
+      el.style.left = cx + "px";
+      el.style.top = cy + "px";
+      el.style.fontSize = size + "px";
+      el.style.setProperty("--tx", tx.toFixed(1) + "px");
+      el.style.setProperty("--ty", ty.toFixed(1) + "px");
+      el.style.setProperty("--sc", sc.toFixed(2));
+      el.style.setProperty("--rot", rot.toFixed(1) + "deg");
+      el.style.setProperty("--dur", dur.toFixed(2) + "s");
+
+      heartBurstLayer.appendChild(el);
+      setTimeout(() => el.remove(), Math.ceil((dur + 0.15) * 1000));
+    }
+  }
+
+  function triggerYesAndGoNext(event) {
+    if (transitioning) return;
+    transitioning = true;
+
+    const target = event && event.currentTarget ? event.currentTarget : null;
+    const rect = target && typeof target.getBoundingClientRect === "function" ? target.getBoundingClientRect() : null;
+    const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+
+    explodeHearts(cx, cy);
+    setTimeout(() => explodeHearts(window.innerWidth * 0.25, window.innerHeight * 0.35), 140);
+    setTimeout(() => explodeHearts(window.innerWidth * 0.75, window.innerHeight * 0.35), 220);
+
+    setTimeout(() => {
+      giantYesOverlay.classList.remove("show");
+      giantYesOverlay.setAttribute("aria-hidden", "true");
+      askScreen.classList.remove("active");
+      surpriseScreen.classList.add("active");
+      transitioning = false;
+    }, 520);
+  }
+
+  function resetSurpriseFlow() {
+    selectedBonusActivity = null;
+    selectedActivityLetter = "";
+    placeChosen = false;
+    randomizeAll();
+
+    document.querySelectorAll("#activityChoices .choice").forEach(b => {
+      b.disabled = false;
+      b.classList.remove("selected");
+      const hint = b.querySelector(".hint");
+      if (hint) hint.textContent = "Sürpriz";
+    });
+
+    document.querySelectorAll("#placeChoices .choice").forEach(b => {
+      b.disabled = false;
+      b.classList.remove("selected");
+      const hint = b.querySelector(".hint");
+      if (hint) hint.textContent = "Sürpriz Yer";
+    });
+
+    pickedActivityBanner.classList.remove("show");
+    placeLuckSection.classList.remove("show");
+    resultEl.classList.remove("show");
+  }
+
+  noBtn.addEventListener("click", () => {
+    noClickCount++;
+    if (noClickCount === 1) {
+      askSub.textContent = "Emin misin? Bir kere daha basarsan işler değişir...";
+      askFooter.textContent = "1. uyarı: Hayır seçeneği tehlikeli bölgede 👀";
+      noBtn.style.transform = "scale(0.92)";
+      yesBtn.style.transform = "scale(1.12)";
+    } else if (noClickCount >= 2) {
+      giantYesOverlay.classList.add("show");
+      giantYesOverlay.setAttribute("aria-hidden", "false");
+    }
+  });
+
+  yesBtn.addEventListener("click", triggerYesAndGoNext);
+  giantYesBtn.addEventListener("click", triggerYesAndGoNext);
+  resetBtn.addEventListener("click", resetSurpriseFlow);
+
+  document.querySelectorAll("#activityChoices .choice").forEach(button => {
+    button.addEventListener("click", () => {
+      if (selectedBonusActivity) return;
+      const letter = button.dataset.choice;
+      const index = letter.charCodeAt(0) - 65;
+      selectedBonusActivity = shuffledBonusActivities[index];
+      selectedActivityLetter = letter;
+
+      document.querySelectorAll("#activityChoices .choice").forEach((b, idx) => {
+        b.disabled = true;
+        const hint = b.querySelector(".hint");
+        if (hint && shuffledBonusActivities[idx]) {
+          hint.textContent = "🐎 + " + shuffledBonusActivities[idx].name;
+        }
+        if (b === button) b.classList.add("selected");
+      });
+
+      pickedActivityTitle.textContent = fixedActivity.emoji + " " + fixedActivity.name + " + " + selectedBonusActivity.emoji + " " + selectedBonusActivity.name + "!";
+      pickedActivityMessage.textContent = letter + " şansından " + selectedBonusActivity.name + " çıktı. " + selectedBonusActivity.message;
+      pickedActivityBanner.classList.add("show");
+
+      placeLuckSection.classList.add("show");
+      placeLuckSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  });
+
+  document.querySelectorAll("#placeChoices .choice").forEach(button => {
+    button.addEventListener("click", () => {
+      if (placeChosen || !selectedBonusActivity) return;
+      placeChosen = true;
+
+      const letter = button.dataset.choice;
+      const index = letter.charCodeAt(0) - 65;
+      const chosenRoute = shuffledRoutes[index];
+
+      document.querySelectorAll("#placeChoices .choice").forEach((b, idx) => {
+        b.disabled = true;
+        const hint = b.querySelector(".hint");
+        if (hint) hint.textContent = "Rota " + (idx + 1);
+        if (b === button) b.classList.add("selected");
+      });
+
+      document.getElementById("resultEmoji").textContent = fixedActivity.emoji + selectedBonusActivity.emoji;
+      document.getElementById("resultSubtitle").textContent =
+        "Aktivite: " + selectedActivityLetter + " (" + fixedActivity.name + " + " + selectedBonusActivity.name + ") • Yer Şansı: " + letter;
+
+      const activityListEl = document.getElementById("activityList");
+      activityListEl.innerHTML = "";
+
+      const liFixed = document.createElement("li");
+      liFixed.innerHTML = "<strong>" + fixedActivity.emoji + " " + fixedActivity.name + "</strong> <em>(Sabit)</em>";
+      activityListEl.appendChild(liFixed);
+
+      const liBonus = document.createElement("li");
+      liBonus.innerHTML = "<strong>" + selectedBonusActivity.emoji + " " + selectedBonusActivity.name + "</strong> <em>(Şansına Gelen)</em>";
+      activityListEl.appendChild(liBonus);
+
+      document.getElementById("summaryDesc").textContent = selectedBonusActivity.message;
+      document.getElementById("summaryRouteTitle").textContent = "🗺️ " + chosenRoute.title;
+
+      const placeListEl = document.getElementById("placeList");
+      placeListEl.innerHTML = "";
+      chosenRoute.places.forEach(place => {
+        const li = document.createElement("li");
+        li.textContent = place;
+        placeListEl.appendChild(li);
+      });
+
+      document.getElementById("routeTip").textContent = chosenRoute.tip;
+      resultEl.classList.add("show");
+      resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  });
+
+  randomizeAll();
+})();
+</script>
+</body>
+</html>
