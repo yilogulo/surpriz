@@ -127,10 +127,10 @@
   }
   .picked-activity-banner.show { display: block; }
   .picked-activity-banner .badge-line {
-    font-size: 21px; font-weight: 800; color: #c34e7d;
+    font-size: 20px; font-weight: 800; color: #c34e7d;
   }
   .picked-activity-banner p {
-    margin: 4px 0 0; color: #806b75; font-size: 14px; line-height: 1.45;
+    margin: 5px 0 0; color: #806b75; font-size: 14px; line-height: 1.45;
   }
 
   /* 2. Şans seçimi: Gezme rotası */
@@ -179,6 +179,16 @@
   .summary-desc {
     font-size: 13.5px; color: #7a6570; margin: 0; line-height: 1.45;
   }
+  .activity-list {
+    list-style: none; margin: 8px 0 0; padding: 0;
+  }
+  .activity-list li {
+    padding: 6px 0;
+    border-bottom: 1px dashed #edd0dc;
+    font-size: 14px; color: #392b33; line-height: 1.4;
+  }
+  .activity-list li:last-child { border-bottom: none; padding-bottom: 2px; }
+
   .place-list {
     list-style: none; margin: 8px 0 0; padding: 0;
   }
@@ -253,17 +263,17 @@
     <div class="footer" id="askFooter">Hayır demeyi deneme bakim ❤️</div>
   </section>
 
-  <!-- İkinci Ekran: 1. Şans (Aktivite) -> 2. Şans (Gezilecek Yer Rotası) -> Sonuç -->
+  <!-- İkinci Ekran: 1. Şans (At Binme Sabit + Lunapark / Atış / Bowling) -> 2. Şans (Gezilecek Yer Rotası) -> Sonuç -->
   <section class="screen" id="surpriseScreen" aria-label="Sürpriz seçimi">
     <div class="heart">💗</div>
     <h1>Eda'nın Sürprizleri</h1>
-    <p class="sub">Bugün seni üç güzel sürprizden biri bekliyor!<br><strong>Önce aktivite şansını seç bakalım...</strong></p>
+    <p class="sub">Her seçenekte <strong>At Binme</strong> garanti!<br>Üstüne şansına ek bir aktivite gelsin bakalım...</p>
 
-    <!-- 1. Şans Seçimi: Aktivite -->
-    <div class="choices" id="activityChoices" aria-label="Aktivite seçimi">
-      <button class="choice" data-choice="A" type="button"><span class="letter">A</span><span class="gift">🎁</span><span class="hint">Aktivite</span></button>
-      <button class="choice" data-choice="B" type="button"><span class="letter">B</span><span class="gift">🎁</span><span class="hint">Aktivite</span></button>
-      <button class="choice" data-choice="C" type="button"><span class="letter">C</span><span class="gift">🎁</span><span class="hint">Aktivite</span></button>
+    <!-- 1. Şans Seçimi: Ekstra Aktivite (+ At Binme Her Zaman Sabit) -->
+    <div class="choices" id="activityChoices" aria-label="Ekstra aktivite seçimi">
+      <button class="choice" data-choice="A" type="button"><span class="letter">A</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
+      <button class="choice" data-choice="B" type="button"><span class="letter">B</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
+      <button class="choice" data-choice="C" type="button"><span class="letter">C</span><span class="gift">🎁</span><span class="hint">Sürpriz</span></button>
     </div>
 
     <!-- Seçilen Aktivite Rozeti -->
@@ -288,15 +298,15 @@
     <!-- Final Sonuç Ekranı -->
     <div class="result" id="result" aria-live="polite">
       <div class="result-header">
-        <div class="emoji" id="resultEmoji">🎉</div>
+        <div class="emoji" id="resultEmoji">🐎🎡</div>
         <h2>Günün Sürpriz Planı!</h2>
         <p class="subtitle" id="resultSubtitle"></p>
       </div>
 
       <div class="summary-box">
-        <div class="summary-label">Seçilen Aktivite</div>
-        <p class="summary-activity" id="summaryActivity"></p>
-        <p class="summary-desc" id="summaryDesc"></p>
+        <div class="summary-label">Günün Aktiviteleri (At Binme Sabit)</div>
+        <ul class="activity-list" id="activityList"></ul>
+        <p class="summary-desc" id="summaryDesc" style="margin-top: 8px;"></p>
       </div>
 
       <div class="summary-box">
@@ -346,14 +356,33 @@
 
   let noClickCount = 0;
   let transitioning = false;
-  let selectedActivity = null;
+  let selectedBonusActivity = null;
   let selectedActivityLetter = "";
   let placeChosen = false;
 
-  const baseActivities = [
-    { name: "At Binme", emoji: "🐎", message: "Hazır ol! Birlikte at binmeye gidiyoruz." },
-    { name: "Bowling", emoji: "🎳", message: "Strike zamanı! Bowling oynuyoruz." },
-    { name: "Atış", emoji: "🎯", message: "Hedefini belirle! Atış deneyimi seni bekliyor." }
+  const fixedActivity = {
+    name: "At Binme",
+    emoji: "🐎",
+    note: "Her seçenekte garanti aktivitemiz."
+  };
+
+  // At Binme her seçenekte sabit; ekstra olarak Lunapark, Atış ve Bowling rastgele dağılır
+  const bonusActivities = [
+    {
+      name: "Lunapark",
+      emoji: "🎡",
+      message: "At binmenin yanına lunapark keyfi eklendi!"
+    },
+    {
+      name: "Atış",
+      emoji: "🎯",
+      message: "At binmenin yanına hedef atışı eklendi!"
+    },
+    {
+      name: "Bowling",
+      emoji: "🎳",
+      message: "At binmenin yanına bowling kapışması eklendi!"
+    }
   ];
 
   const baseRoutes = [
@@ -389,7 +418,7 @@
     }
   ];
 
-  let shuffledActivities = [];
+  let shuffledBonusActivities = [];
   let shuffledRoutes = [];
 
   function shuffleArray(arr) {
@@ -402,7 +431,7 @@
   }
 
   function randomizeAll() {
-    shuffledActivities = shuffleArray(baseActivities);
+    shuffledBonusActivities = shuffleArray(bonusActivities);
     shuffledRoutes = shuffleArray(baseRoutes);
   }
 
@@ -459,7 +488,7 @@
   }
 
   function resetSurpriseFlow() {
-    selectedActivity = null;
+    selectedBonusActivity = null;
     selectedActivityLetter = "";
     placeChosen = false;
     randomizeAll();
@@ -467,7 +496,7 @@
     document.querySelectorAll("#activityChoices .choice").forEach(b => {
       b.disabled = false;
       b.classList.remove("selected");
-      b.querySelector(".hint").textContent = "Aktivite";
+      b.querySelector(".hint").textContent = "Sürpriz";
     });
 
     document.querySelectorAll("#placeChoices .choice").forEach(b => {
@@ -498,69 +527,7 @@
   giantYesBtn.addEventListener("click", triggerYesAndGoNext);
   resetBtn.addEventListener("click", resetSurpriseFlow);
 
-  // 1. Şans: Aktivite Seçimi (A/B/C rastgele atanmış)
+  // 1. Şans: At Binme sabit + seçilen harften rastgele bonus aktivite (Lunapark / Atış / Bowling)
   document.querySelectorAll("#activityChoices .choice").forEach(button => {
     button.addEventListener("click", () => {
-      if (selectedActivity) return;
-      const letter = button.dataset.choice;
-      const index = letter.charCodeAt(0) - 65;
-      selectedActivity = shuffledActivities[index];
-      selectedActivityLetter = letter;
-
-      document.querySelectorAll("#activityChoices .choice").forEach((b, idx) => {
-        b.disabled = true;
-        b.querySelector(".hint").textContent = shuffledActivities[idx].name;
-        if (b === button) b.classList.add("selected");
-      });
-
-      pickedActivityTitle.textContent = `${selectedActivity.emoji} ${selectedActivity.name}!`;
-      pickedActivityMessage.textContent = `${letter} şansından bu aktivite çıktı. ${selectedActivity.message}`;
-      pickedActivityBanner.classList.add("show");
-
-      placeLuckSection.classList.add("show");
-      placeLuckSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    });
-  });
-
-  // 2. Şans: Gezilecek Yer Rotası Seçimi (A/B/C rastgele atanmış)
-  document.querySelectorAll("#placeChoices .choice").forEach(button => {
-    button.addEventListener("click", () => {
-      if (placeChosen || !selectedActivity) return;
-      placeChosen = true;
-
-      const letter = button.dataset.choice;
-      const index = letter.charCodeAt(0) - 65;
-      const chosenRoute = shuffledRoutes[index];
-
-      document.querySelectorAll("#placeChoices .choice").forEach((b, idx) => {
-        b.disabled = true;
-        b.querySelector(".hint").textContent = `Rota ${idx + 1}`;
-        if (b === button) b.classList.add("selected");
-      });
-
-      document.getElementById("resultEmoji").textContent = selectedActivity.emoji;
-      document.getElementById("resultSubtitle").textContent =
-        `Aktivite: ${selectedActivityLetter} (${selectedActivity.name}) • Yer Şansı: ${letter}`;
-      document.getElementById("summaryActivity").textContent =
-        `${selectedActivity.emoji} ${selectedActivity.name}`;
-      document.getElementById("summaryDesc").textContent = selectedActivity.message;
-
-      document.getElementById("summaryRouteTitle").textContent = `🗺️ ${chosenRoute.title}`;
-      const placeListEl = document.getElementById("placeList");
-      placeListEl.innerHTML = "";
-      chosenRoute.places.forEach(place => {
-        const li = document.createElement("li");
-        li.textContent = place;
-        placeListEl.appendChild(li);
-      });
-
-      document.getElementById("routeTip").textContent = chosenRoute.tip;
-      resultEl.classList.add("show");
-      resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    });
-  });
-
-  randomizeAll();
-</script>
-</body>
-</html>
+     
